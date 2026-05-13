@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>SKOLITA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #08090F;
+  --surface: #0F1120;
+  --surface2: #171929;
+  --border: #1E2240;
+  --text: #EEF0FF;
+  --text-sec: #7B82B0;
+  --text-ter: #3A4070;
+
+  /* Accent palette */
+  --blue: #3B82F6;
+  --blue-dim: rgba(59,130,246,0.12);
+  --cyan: #06B6D4;
+  --cyan-dim: rgba(6,182,212,0.12);
+  --orange: #F97316;
+  --orange-dim: rgba(249,115,22,0.12);
+  --purple: #A855F7;
+  --purple-dim: rgba(168,85,247,0.12);
+  --green: #10B981;
+  --green-dim: rgba(16,185,129,0.12);
+
+  --r: 14px; --rsm: 9px;
+}
+* { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
+html { background:var(--bg); }
+body { font-family:'Space Grotesk',sans-serif; color:var(--text); background:var(--bg); max-width:480px; margin:0 auto; min-height:100vh; }
+.screen { display:none; min-height:100vh; animation:fadeIn 0.2s ease; position:relative; overflow:hidden; }
+.screen.active { display:block; }
+@keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:none} }
+
+/* HEADER */
+.header { padding:1rem 1.2rem; display:flex; align-items:center; gap:10px; border-bottom:1px solid var(--border); position:sticky; top:0; z-index:20; background:rgba(8,9,15,0.9); backdrop-filter:blur(14px); }
+.back-btn { background:var(--surface2); border:1px solid var(--border); cursor:pointer; color:var(--text-sec); font-size:13px; font-weight:600; padding:6px 13px; border-radius:30px; display:flex; align-items:center; gap:4px; font-family:'Space Grotesk',sans-serif; transition:all 0.15s; }
+.back-btn:hover { border-color:var(--blue); color:var(--blue); }
+.header-title { font-size:16px; font-weight:700; color:var(--text); letter-spacing:-0.3px; }
+
+/* HOME */
+.home-top { padding:1.5rem 1.2rem 1.2rem; text-align:center; }
+.logo-wrap { display:flex; align-items:center; gap:14px; margin-bottom:2px; }
+.wordmark { font-family:'Space Mono',monospace; font-size:32px; font-weight:700; letter-spacing:-1px; background:linear-gradient(135deg, var(--blue) 0%, var(--cyan) 50%, var(--purple) 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+.home-sub { font-family:'Space Mono',monospace; font-size:10px; font-weight:700; letter-spacing:0.15em; background:linear-gradient(135deg,var(--blue),var(--cyan),var(--purple)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; margin-top:10px; line-height:1.5; }
+
+/* REVIEW BANNER */
+.review-banner { margin:0 1.2rem 1rem; background:linear-gradient(135deg, var(--orange-dim), rgba(168,85,247,0.08)); border:1px solid rgba(249,115,22,0.25); border-radius:var(--r); padding:1rem 1.1rem; display:flex; align-items:center; gap:12px; cursor:pointer; width:calc(100% - 2.4rem); transition:all 0.15s; }
+.review-banner:hover { border-color:rgba(249,115,22,0.5); }
+.review-title { font-size:14px; font-weight:700; color:var(--orange); display:flex; align-items:center; gap:8px; }
+.review-sub { font-size:12px; color:var(--text-sec); margin-top:2px; }
+.badge { background:var(--orange); color:#FFF; font-size:11px; font-weight:700; padding:1px 8px; border-radius:20px; }
+
+/* STEP CARDS */
+.steps-wrap { padding:0 1.2rem 2rem; display:flex; flex-direction:column; gap:8px; }
+.step-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--r); padding:1rem 1.1rem; display:flex; align-items:center; gap:14px; cursor:pointer; transition:all 0.15s; position:relative; overflow:hidden; }
+.step-card::after { content:''; position:absolute; inset:0; opacity:0; transition:opacity 0.2s; border-radius:var(--r); }
+.step-card:hover { border-color:var(--step-color,var(--blue)); transform:translateY(-1px); box-shadow:0 4px 20px rgba(0,0,0,0.3); }
+.sc1{--step-color:var(--blue)}.sc2{--step-color:var(--cyan)}.sc3{--step-color:var(--purple)}.sc4{--step-color:var(--orange)}.sc5{--step-color:var(--green)}
+
+.step-num { width:42px; height:42px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-family:'Space Mono',monospace; font-size:20px; font-weight:700; flex-shrink:0; }
+.sn1{background:var(--blue-dim);color:var(--blue)}.sn2{background:var(--cyan-dim);color:var(--cyan)}.sn3{background:var(--purple-dim);color:var(--purple)}.sn4{background:var(--orange-dim);color:var(--orange)}.sn5{background:var(--green-dim);color:var(--green)}
+
+.step-info { flex:1; }
+.step-title { font-size:15px; font-weight:700; color:var(--text); letter-spacing:-0.2px; }
+.step-desc { font-size:12px; color:var(--text-sec); margin-top:3px; display:flex; align-items:center; gap:6px; flex-wrap:wrap; font-weight:500; }
+.ai-pill { font-size:10px; font-weight:700; padding:2px 8px; border-radius:20px; letter-spacing:0.05em; }
+.step-arrow { color:var(--text-ter); font-size:18px; font-weight:700; }
+
+/* DETAIL */
+.detail-body { padding:1.2rem; }
+
+.info-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--r); padding:1.1rem; margin-bottom:1rem; font-size:14px; color:var(--text); line-height:1.7; font-weight:500; }
+.info-card-label { font-size:10px; font-weight:700; color:var(--text-ter); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:8px; }
+
+.criteria-card { border-radius:var(--r); padding:1rem 1.1rem; margin-bottom:1rem; background:var(--orange-dim); border:1px solid rgba(249,115,22,0.25); }
+.criteria-label { font-size:10px; font-weight:700; color:var(--orange); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:6px; }
+.criteria-text { font-size:13px; color:var(--text); line-height:1.55; font-weight:500; }
+
+.tip-card { background:var(--cyan-dim); border:1px solid rgba(6,182,212,0.2); border-radius:var(--rsm); padding:0.75rem 1rem; margin-bottom:1rem; font-size:13px; color:var(--text); line-height:1.5; font-weight:500; }
+
+.field-label { font-size:11px; font-weight:700; color:var(--text-sec); margin-bottom:6px; margin-top:1rem; display:block; letter-spacing:0.05em; text-transform:uppercase; }
+.fields-row { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+
+input[type=text], textarea, select {
+  width:100%; background:var(--surface); border:1px solid var(--border); border-radius:var(--rsm);
+  padding:11px 13px; font-size:14px; color:var(--text); font-weight:500;
+  font-family:'Space Grotesk',sans-serif; line-height:1.5; outline:none; transition:border-color 0.15s;
+}
+input[type=text]:focus, textarea:focus, select:focus { border-color:var(--blue); }
+select { appearance:none; cursor:pointer; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237B82B0' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 12px center; padding-right:32px; }
+select option { background:var(--surface2); }
+textarea { resize:vertical; min-height:72px; }
+::placeholder { color:var(--text-ter); }
+
+/* BUTTONS */
+.ai-btn { width:100%; margin-top:10px; padding:13px; border:none; border-radius:var(--rsm); background:linear-gradient(135deg,var(--blue),var(--cyan)); color:#FFF; font-size:14px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; font-family:'Space Grotesk',sans-serif; transition:opacity 0.15s,transform 0.1s; letter-spacing:0.02em; }
+.ai-btn:hover { opacity:0.88; }
+.ai-btn:active { transform:scale(0.98); }
+.ai-btn:disabled { opacity:0.35; cursor:not-allowed; }
+.disc { font-size:11px; color:var(--text-sec); margin-top:6px; font-weight:500; }
+
+/* CHAT */
+.chat-section { margin-top:1.2rem; border-top:1px solid var(--border); padding-top:1.2rem; display:none; }
+.chat-label { font-size:10px; font-weight:700; color:var(--text-ter); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:12px; }
+.chat-messages { display:flex; flex-direction:column; gap:10px; margin-bottom:12px; }
+.msg { max-width:88%; padding:10px 14px; border-radius:14px; font-size:14px; line-height:1.65; word-break:break-word; font-weight:500; }
+.msg-user { background:linear-gradient(135deg,var(--blue),var(--purple)); color:#FFF; align-self:flex-end; border-radius:14px 14px 4px 14px; }
+.msg-ai { background:var(--surface2); border:1px solid var(--border); color:var(--text); align-self:flex-start; border-radius:14px 14px 14px 4px; }
+.msg-ai strong { color:var(--cyan); }
+.msg-typing { color:var(--text-ter); font-style:italic; font-size:13px; }
+
+.fc-suggest { margin-top:8px; display:inline-flex; align-items:center; gap:6px; background:var(--orange-dim); border:1px solid rgba(249,115,22,0.3); border-radius:30px; padding:5px 13px; font-size:12px; font-weight:700; color:var(--orange); cursor:pointer; transition:background 0.15s; }
+.fc-suggest:hover { background:rgba(249,115,22,0.2); }
+
+.chat-input-row { display:flex; gap:8px; align-items:flex-end; }
+.chat-input-row textarea { min-height:44px; max-height:110px; resize:none; flex:1; border-radius:var(--rsm); padding:10px 12px; }
+.send-btn { width:44px; height:44px; border-radius:var(--rsm); background:linear-gradient(135deg,var(--blue),var(--cyan)); border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:17px; color:#FFF; transition:opacity 0.15s; }
+.send-btn:hover { opacity:0.85; }
+.send-btn:disabled { opacity:0.35; cursor:not-allowed; }
+
+.notes-wrap { margin-top:0.5rem; }
+
+.nav-btns { display:flex; flex-direction:column; gap:8px; margin-top:1.5rem; }
+.next-btn { width:100%; padding:14px; border:none; border-radius:var(--rsm); background:var(--surface2); border:1px solid var(--border); color:var(--text-sec); font-size:15px; font-weight:700; cursor:pointer; font-family:'Space Grotesk',sans-serif; transition:all 0.15s; display:flex; align-items:center; justify-content:center; gap:8px; letter-spacing:0.01em; }
+.next-btn:hover { background:var(--border); color:var(--text); }
+.next-btn.last { background:linear-gradient(135deg,var(--blue),var(--purple)); color:#FFF; border-color:transparent; }
+.next-btn.last:hover { opacity:0.88; }
+.prev-btn { width:100%; padding:12px; border:1px solid var(--border); border-radius:var(--rsm); background:transparent; color:var(--text-ter); font-size:14px; font-weight:600; cursor:pointer; font-family:'Space Grotesk',sans-serif; transition:all 0.15s; display:flex; align-items:center; justify-content:center; gap:6px; }
+.prev-btn:hover { border-color:var(--text-ter); color:var(--text-sec); }
+
+/* REVIEW */
+.review-body { padding:1.2rem; }
+.review-hint { font-size:13px; color:var(--text-sec); margin-bottom:1.2rem; line-height:1.5; font-weight:500; }
+.fc-empty { text-align:center; padding:3rem 1rem; color:var(--text-ter); font-size:14px; line-height:1.7; font-weight:500; }
+.fc-empty-icon { font-size:36px; display:block; margin-bottom:12px; }
+.fc-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--r); padding:1.1rem; margin-bottom:10px; transition:border-color 0.15s; }
+.fc-concept { font-size:15px; font-weight:700; color:var(--text); margin-bottom:3px; letter-spacing:-0.2px; }
+.fc-date { font-size:11px; color:var(--text-ter); margin-bottom:12px; font-weight:500; }
+.fc-answer-box { font-size:14px; color:var(--text-sec); line-height:1.65; display:none; padding-top:10px; border-top:1px solid var(--border); margin-bottom:12px; word-break:break-word; font-weight:500; }
+.fc-actions { display:flex; gap:7px; }
+.fc-btn { flex:1; padding:9px 6px; border-radius:var(--rsm); font-size:13px; font-weight:700; cursor:pointer; background:var(--surface2); border:1px solid var(--border); color:var(--text-sec); font-family:'Space Grotesk',sans-serif; display:flex; align-items:center; justify-content:center; gap:5px; transition:all 0.12s; }
+.fc-btn:hover { background:var(--border); color:var(--text); }
+.fc-btn-ok { color:var(--green); border-color:rgba(16,185,129,0.3); }
+.fc-btn-ok:hover { background:var(--green-dim); }
+.fc-btn-no { color:var(--orange); border-color:rgba(249,115,22,0.3); }
+.fc-btn-no:hover { background:var(--orange-dim); }
+.fc-btn-del { max-width:44px; }
+.fc-pending { font-size:12px; color:var(--orange); font-weight:700; margin-top:8px; }
+
+/* DONE */
+.done-body { padding:3rem 1.2rem 2rem; text-align:center; }
+.done-icon { font-size:56px; display:block; margin-bottom:1.2rem; }
+.done-title { font-family:'Space Mono',monospace; font-size:28px; font-weight:700; letter-spacing:-1px; margin-bottom:10px; background:linear-gradient(135deg,var(--blue),var(--cyan),var(--purple)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+.done-text { font-size:14px; color:var(--text-sec); line-height:1.65; margin-bottom:2rem; font-weight:500; }
+.done-btns { display:flex; flex-direction:column; gap:10px; }
+.done-primary { padding:14px; border:none; border-radius:var(--rsm); background:linear-gradient(135deg,var(--orange),var(--purple)); color:#FFF; font-size:15px; font-weight:700; cursor:pointer; font-family:'Space Grotesk',sans-serif; transition:opacity 0.15s; }
+.done-primary:hover { opacity:0.88; }
+.done-sec { padding:13px; border:1px solid var(--border); border-radius:var(--rsm); background:transparent; font-size:14px; color:var(--text-sec); cursor:pointer; font-family:'Space Grotesk',sans-serif; font-weight:600; transition:background 0.15s; }
+.done-sec:hover { background:var(--surface); }
+
+.step-hero { padding:1.2rem 1.2rem 0; }
+.step-hero-num { font-family:'Space Mono',monospace; font-size:13px; font-weight:700; letter-spacing:0.1em; color:var(--text-ter); text-transform:uppercase; margin-bottom:4px; }
+.step-hero-title { font-family:'Space Mono',monospace; font-size:28px; font-weight:700; letter-spacing:0.08em; line-height:1.1; text-transform:uppercase; background:linear-gradient(135deg,var(--blue),var(--cyan),var(--purple)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; margin-bottom:0; }
+.check-item { margin-bottom:14px; }
+.check-label { display:flex; align-items:flex-start; gap:10px; cursor:pointer; }
+.check-box { width:20px; height:20px; border-radius:6px; border:2px solid var(--border); background:var(--surface); cursor:pointer; flex-shrink:0; margin-top:1px; accent-color:var(--blue); }
+.check-text { font-size:14px; color:var(--text); line-height:1.6; font-weight:500; }
+.check-label:has(.check-box:checked) .check-text { color:var(--text-sec); text-decoration:line-through; opacity:0.6; }
+.check-note { font-size:12px; color:var(--orange); line-height:1.5; margin-top:5px; margin-left:30px; font-weight:500; font-style:italic; }
+.techniques-box { background:var(--surface2); border-radius:var(--rsm); padding:0.9rem 1rem; margin:8px 0 4px 0; border:1px solid var(--border); }
+.techniques-label { font-size:10px; font-weight:700; color:var(--text-ter); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px; }
+.tech-label { display:flex; align-items:center; gap:8px; margin-bottom:8px; cursor:pointer; }
+.tech-text { font-size:13px; color:var(--text-sec); font-weight:500; line-height:1.4; }
+.tech-label:has(input:checked) .tech-text { color:var(--cyan); font-weight:600; }
+@keyframes spin { to{transform:rotate(360deg)} }
+.spin { display:inline-block; width:15px; height:15px; border:2px solid rgba(255,255,255,0.3); border-top-color:#FFF; border-radius:50%; animation:spin 0.7s linear infinite; }
+
+/* DECORATIVE CIRCLES */
+.deco { position:absolute; pointer-events:none; z-index:0; inset:0; overflow:hidden; }
+.deco svg { position:absolute; top:0; left:0; width:100%; height:100%; }
+.screen > *:not(.deco) { position:relative; z-index:1; }
+</style>
+</head>
+<body>
+
+<!-- HOME -->
+<div id="home" class="screen active">
+  <div class="deco"><svg viewBox="0 0 480 900" preserveAspectRatio="xMidYMid slice">
+    <circle cx="420" cy="80" r="140" fill="#3B82F6" opacity="0.06"/>
+    <circle cx="-30" cy="320" r="180" fill="#06B6D4" opacity="0.05"/>
+    <circle cx="460" cy="560" r="120" fill="#A855F7" opacity="0.05"/>
+    <circle cx="40" cy="740" r="100" fill="#F97316" opacity="0.05"/>
+    <circle cx="380" cy="820" r="80" fill="#10B981" opacity="0.04"/>
+  </svg></div>
+  <div class="home-top">
+    <svg width="100%" viewBox="0 0 480 175" xmlns="http://www.w3.org/2000/svg" style="display:block;margin-bottom:0">
+      <defs>
+        <linearGradient id="gtext" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" style="stop-color:#3B82F6"/>
+          <stop offset="50%" style="stop-color:#06B6D4"/>
+          <stop offset="100%" style="stop-color:#A855F7"/>
+        </linearGradient>
+        <linearGradient id="gtag" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" style="stop-color:#F97316"/>
+          <stop offset="100%" style="stop-color:#A855F7"/>
+        </linearGradient>
+      </defs>
+      <!-- circulo top left com arcos -->
+      <circle cx="68" cy="58" r="42" fill="#3B82F6" fill-opacity="0.08"/>
+      <path d="M 48 38 A 25 25 0 1 1 47.2 38.8" fill="none" stroke="#3B82F6" stroke-width="3" stroke-linecap="round" opacity="0.9"/>
+      <circle cx="48" cy="38" r="2.8" fill="#3B82F6" opacity="0.9"/>
+      <path d="M 52 42 A 19 19 0 1 1 51.3 42.7" fill="none" stroke="#06B6D4" stroke-width="2.6" stroke-linecap="round" opacity="0.9"/>
+      <circle cx="52" cy="42" r="2.4" fill="#06B6D4" opacity="0.9"/>
+      <path d="M 55.5 45.5 A 14 14 0 1 1 54.9 46.1" fill="none" stroke="#A855F7" stroke-width="2.2" stroke-linecap="round" opacity="0.9"/>
+      <circle cx="55.5" cy="45.5" r="2" fill="#A855F7" opacity="0.9"/>
+      <path d="M 58.5 48.5 A 9.5 9.5 0 1 1 58 49" fill="none" stroke="#F97316" stroke-width="2" stroke-linecap="round" opacity="0.9"/>
+      <circle cx="58.5" cy="48.5" r="1.8" fill="#F97316" opacity="0.9"/>
+      <path d="M 61 51 A 6 6 0 1 1 60.6 51.4" fill="none" stroke="#10B981" stroke-width="1.8" stroke-linecap="round" opacity="0.9"/>
+      <circle cx="61" cy="51" r="1.5" fill="#10B981" opacity="0.9"/>
+      <!-- outros circulos decorativos -->
+      <circle cx="448" cy="175" r="36" fill="#A855F7" fill-opacity="0.07"/>
+      <circle cx="420" cy="22" r="16" fill="#06B6D4" fill-opacity="0.11"/>
+      <circle cx="105" cy="192" r="14" fill="#F97316" fill-opacity="0.13"/>
+      <!-- dots top right -->
+      <circle cx="432" cy="14" r="3" fill="#06B6D4" opacity="0.7"/>
+      <circle cx="446" cy="24" r="2.5" fill="#A855F7" opacity="0.6"/>
+      <circle cx="456" cy="12" r="3.5" fill="#3B82F6" opacity="0.5"/>
+      <circle cx="418" cy="22" r="2" fill="#F97316" opacity="0.6"/>
+      <!-- dots bottom left -->
+      <circle cx="24" cy="192" r="3.5" fill="#A855F7" opacity="0.5"/>
+      <circle cx="38" cy="203" r="2" fill="#06B6D4" opacity="0.6"/>
+      <circle cx="14" cy="206" r="3" fill="#3B82F6" opacity="0.4"/>
+      <!-- wordmark -->
+      <text x="240" y="138"
+        font-family="Space Mono, monospace"
+        font-size="72"
+        font-weight="700"
+        text-anchor="middle"
+        letter-spacing="-2"
+        fill="url(#gtext)">SKOLITA</text>
+      <!-- accent line -->
+      <rect x="170" y="150" width="140" height="2" rx="1" fill="url(#gtag)" opacity="0.6"/>
+      <!-- método de estudo -->
+      <text x="240" y="170"
+        font-family="'Space Grotesk', Arial, sans-serif"
+        font-size="11"
+        font-weight="600"
+        text-anchor="middle"
+        letter-spacing="6"
+        fill="#7B82B0">MÉTODO DE ESTUDO</text>
+      <!-- squares decorativos -->
+      <rect x="18" y="88" width="10" height="10" rx="2" fill="#3B82F6" opacity="0.4" transform="rotate(20 23 93)"/>
+      <rect x="34" y="74" width="6" height="6" rx="1" fill="#06B6D4" opacity="0.3" transform="rotate(-10 37 77)"/>
+      <rect x="446" cy="148" width="9" height="9" rx="2" fill="#F97316" opacity="0.4" transform="rotate(15 451 153)"/>
+      <rect x="432" y="162" width="5" height="5" rx="1" fill="#A855F7" opacity="0.3" transform="rotate(-20 435 165)"/>
+    </svg>
+
+    <p class="home-sub">OS 5 PASSOS QUE MUDAM A FORMA COMO ESTUDAS.</p>
+  </div>
+  <button class="review-banner" onclick="openReview()">
+    <div style="font-size:22px">🃏</div>
+    <div style="flex:1">
+      <div class="review-title">Para rever <span class="badge" id="fc-count">0</span></div>
+      <div class="review-sub">Flashcards guardados</div>
+    </div>
+    <span style="color:var(--orange);font-size:20px;font-weight:700">›</span>
+  </button>
+  <div class="steps-wrap">
+    <div class="step-card sc1" onclick="openStep(0)"><div class="step-num sn1" style="flex-direction:column;font-size:11px;gap:2px;width:48px;height:48px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" y1="3" x2="9" y2="18"/><line x1="15" y1="6" x2="15" y2="21"/></svg><span>01</span></div><div class="step-info"><div class="step-title">Mapear</div><div class="step-desc">Saber qual é a matéria e onde está</div></div><span class="step-arrow">›</span></div>
+    <div class="step-card sc2" onclick="openStep(1)"><div class="step-num sn2" style="flex-direction:column;font-size:11px;gap:2px;width:48px;height:48px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg><span>02</span></div><div class="step-info"><div class="step-title">Leitura ativa</div><div class="step-desc">Primeira leitura real <span class="ai-pill" style="background:var(--cyan-dim);color:var(--cyan)">IA</span></div></div><span class="step-arrow">›</span></div>
+    <div class="step-card sc3" onclick="openStep(2)"><div class="step-num sn3" style="flex-direction:column;font-size:11px;gap:2px;width:48px;height:48px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="2" width="8" height="4" rx="1"/><rect x="1" y="17" width="6" height="4" rx="1"/><rect x="9" y="17" width="6" height="4" rx="1"/><rect x="17" y="17" width="6" height="4" rx="1"/><path d="M12 6v4"/><path d="M4 17v-4a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v4"/><line x1="12" y1="10" x2="12" y2="12"/></svg><span>03</span></div><div class="step-info"><div class="step-title">Estruturar</div><div class="step-desc">Organizar o que percebeste</div></div><span class="step-arrow">›</span></div>
+    <div class="step-card sc4" onclick="openStep(3)"><div class="step-num sn4" style="flex-direction:column;font-size:11px;gap:2px;width:48px;height:48px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg><span>04</span></div><div class="step-info"><div class="step-title">Explicar</div><div class="step-desc">Provar a ti mesmo que sabes</div></div><span class="step-arrow">›</span></div>
+    <div class="step-card sc5" onclick="openStep(4)"><div class="step-num sn5" style="flex-direction:column;font-size:11px;gap:2px;width:48px;height:48px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6"/><path d="M10 3v6l-4.5 9A1 1 0 0 0 6.4 20h11.2a1 1 0 0 0 .9-1.45L14 9V3"/><line x1="6.8" y1="15" x2="17.2" y2="15"/></svg><span>05</span></div><div class="step-info"><div class="step-title">Testar</div><div class="step-desc">Fechar o ciclo <span class="ai-pill" style="background:var(--green-dim);color:var(--green)">IA</span></div></div><span class="step-arrow">›</span></div>
+  </div>
+</div>
+
+<!-- DETAIL -->
+<div id="detail" class="screen">
+  <div class="deco"><svg viewBox="0 0 480 900" preserveAspectRatio="xMidYMid slice">
+    <circle cx="-40" cy="150" r="160" fill="#A855F7" opacity="0.06"/>
+    <circle cx="460" cy="380" r="140" fill="#3B82F6" opacity="0.05"/>
+    <circle cx="60" cy="600" r="120" fill="#06B6D4" opacity="0.05"/>
+    <circle cx="420" cy="780" r="100" fill="#F97316" opacity="0.04"/>
+  </svg></div>
+  <div class="header">
+    <button class="back-btn" onclick="goHome()">‹ início</button>
+    <svg width="28" height="28" viewBox="0 0 52 52" fill="none" style="flex-shrink:0;opacity:0.85">
+        <circle cx="26" cy="26" r="24" fill="#3B82F6" fill-opacity="0.08"/>
+        <path d="M 13 13 A 18 18 0 1 1 12.2 13.8" fill="none" stroke="#3B82F6" stroke-width="3.2" stroke-linecap="round"/>
+        <circle cx="13" cy="13" r="2.2" fill="#3B82F6"/>
+        <path d="M 16.5 16.5 A 13.5 13.5 0 1 1 15.8 17.2" fill="none" stroke="#06B6D4" stroke-width="2.8" stroke-linecap="round"/>
+        <circle cx="16.5" cy="16.5" r="1.9" fill="#06B6D4"/>
+        <path d="M 19.5 19.5 A 9.5 9.5 0 1 1 18.9 20.1" fill="none" stroke="#A855F7" stroke-width="2.4" stroke-linecap="round"/>
+        <circle cx="19.5" cy="19.5" r="1.6" fill="#A855F7"/>
+        <path d="M 22 22 A 6.5 6.5 0 1 1 21.5 22.5" fill="none" stroke="#F97316" stroke-width="2" stroke-linecap="round"/>
+        <circle cx="22" cy="22" r="1.4" fill="#F97316"/>
+        <path d="M 24 24 A 4 4 0 1 1 23.6 24.4" fill="none" stroke="#10B981" stroke-width="1.8" stroke-linecap="round"/>
+        <circle cx="24" cy="24" r="1.2" fill="#10B981"/>
+      </svg>
+    <div class="header-title" id="d-title"></div>
+  </div>
+  <div id="d-hero" class="step-hero"></div>
+  <div class="detail-body" id="d-body"></div>
+</div>
+
+<!-- REVIEW -->
+<div id="review" class="screen">
+  <div class="deco"><svg viewBox="0 0 480 900" preserveAspectRatio="xMidYMid slice">
+    <circle cx="440" cy="120" r="130" fill="#F97316" opacity="0.06"/>
+    <circle cx="-20" cy="400" r="160" fill="#10B981" opacity="0.05"/>
+    <circle cx="400" cy="650" r="110" fill="#A855F7" opacity="0.05"/>
+    <circle cx="60" cy="820" r="90" fill="#06B6D4" opacity="0.04"/>
+  </svg></div>
+  <div class="header">
+    <button class="back-btn" onclick="goHome()">‹ início</button>
+    <svg width="28" height="28" viewBox="0 0 52 52" fill="none" style="flex-shrink:0;opacity:0.85">
+        <circle cx="26" cy="26" r="24" fill="#3B82F6" fill-opacity="0.08"/>
+        <path d="M 13 13 A 18 18 0 1 1 12.2 13.8" fill="none" stroke="#3B82F6" stroke-width="3.2" stroke-linecap="round"/>
+        <circle cx="13" cy="13" r="2.2" fill="#3B82F6"/>
+        <path d="M 16.5 16.5 A 13.5 13.5 0 1 1 15.8 17.2" fill="none" stroke="#06B6D4" stroke-width="2.8" stroke-linecap="round"/>
+        <circle cx="16.5" cy="16.5" r="1.9" fill="#06B6D4"/>
+        <path d="M 19.5 19.5 A 9.5 9.5 0 1 1 18.9 20.1" fill="none" stroke="#A855F7" stroke-width="2.4" stroke-linecap="round"/>
+        <circle cx="19.5" cy="19.5" r="1.6" fill="#A855F7"/>
+        <path d="M 22 22 A 6.5 6.5 0 1 1 21.5 22.5" fill="none" stroke="#F97316" stroke-width="2" stroke-linecap="round"/>
+        <circle cx="22" cy="22" r="1.4" fill="#F97316"/>
+        <path d="M 24 24 A 4 4 0 1 1 23.6 24.4" fill="none" stroke="#10B981" stroke-width="1.8" stroke-linecap="round"/>
+        <circle cx="24" cy="24" r="1.2" fill="#10B981"/>
+      </svg>
+    <div class="header-title" style="font-family:'Space Mono',monospace;font-size:18px;font-weight:700;letter-spacing:-0.5px;background:linear-gradient(135deg,var(--blue),var(--cyan),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">Para rever</div>
+  </div>
+  <div class="review-body">
+    <p class="review-hint">Conceitos que falhaste. Marca "Sei" para eliminar.</p>
+    <div id="fc-list"></div>
+  </div>
+</div>
+
+<!-- DONE -->
+<div id="done" class="screen">
+  <div class="deco"><svg viewBox="0 0 480 900" preserveAspectRatio="xMidYMid slice">
+    <circle cx="240" cy="200" r="200" fill="#10B981" opacity="0.06"/>
+    <circle cx="-40" cy="500" r="150" fill="#06B6D4" opacity="0.05"/>
+    <circle cx="460" cy="700" r="130" fill="#3B82F6" opacity="0.05"/>
+  </svg></div>
+  <div class="header"><button class="back-btn" onclick="goHome()">‹ início</button><svg width="28" height="28" viewBox="0 0 52 52" fill="none" style="flex-shrink:0;opacity:0.85">
+        <circle cx="26" cy="26" r="24" fill="#3B82F6" fill-opacity="0.08"/>
+        <path d="M 13 13 A 18 18 0 1 1 12.2 13.8" fill="none" stroke="#3B82F6" stroke-width="3.2" stroke-linecap="round"/>
+        <circle cx="13" cy="13" r="2.2" fill="#3B82F6"/>
+        <path d="M 16.5 16.5 A 13.5 13.5 0 1 1 15.8 17.2" fill="none" stroke="#06B6D4" stroke-width="2.8" stroke-linecap="round"/>
+        <circle cx="16.5" cy="16.5" r="1.9" fill="#06B6D4"/>
+        <path d="M 19.5 19.5 A 9.5 9.5 0 1 1 18.9 20.1" fill="none" stroke="#A855F7" stroke-width="2.4" stroke-linecap="round"/>
+        <circle cx="19.5" cy="19.5" r="1.6" fill="#A855F7"/>
+        <path d="M 22 22 A 6.5 6.5 0 1 1 21.5 22.5" fill="none" stroke="#F97316" stroke-width="2" stroke-linecap="round"/>
+        <circle cx="22" cy="22" r="1.4" fill="#F97316"/>
+        <path d="M 24 24 A 4 4 0 1 1 23.6 24.4" fill="none" stroke="#10B981" stroke-width="1.8" stroke-linecap="round"/>
+        <circle cx="24" cy="24" r="1.2" fill="#10B981"/>
+      </svg></div>
+  <div class="done-body">
+    <span class="done-icon">⚡</span>
+    <div class="done-title">CICLO COMPLETO</div>
+    <p class="done-text">Fizeste os 5 passos.<br>Estudaste com método — não com sorte.</p>
+    <div class="done-btns">
+      <button class="done-primary" onclick="openReview()">Ver flashcards para rever</button>
+      <button class="done-sec" onclick="goHome()">Recomeçar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const STEPS=[
+  {title:"01 Mapear",checks:[
+    {text:"Abre o livro e folheia, do início ao fim, da matéria a estudar.",note:"Agora o teu cérebro já tem uma ideia geral do que terá de fazer."},
+    {text:"No teu caderno faz uma lista de títulos e subtítulos que vais encontrando e coloca a página em que se encontram.",note:"Parabéns! Acabaste de criar um mapa que te guiará ao longo do estudo. Ainda não estás a estudar mas o teu cérebro acha que sim."}
+  ],criteria:"Com a lista feita, avança para o próximo passo. O mapa está nas tuas mãos. Já não te perdes!",ai:false,next:1},
+  {title:"02 Leitura ativa",checks:[
+    {text:"Lê o texto devagar colocando uma bolinha em cima de todas as palavras que não conheces.",note:"Se tiveres muitas bolinhas é impossível compreenderes a mensagem do texto. Mas temos a solução!"},
+    {text:"Na caixa em baixo escreve a disciplina e ano que estás a estudar.",note:null},
+    {text:"A seguir coloca todas as palavras que não conheces na caixa <span style=\"color:var(--cyan);font-weight:700\">Palavras com bolinha</span>.",note:"A IA explica e responde às tuas dúvidas."},
+    {text:"Fiz uma segunda leitura do texto com compreensão total.",note:null}
+  ],criteria:"Se já consegues ler o texto e perceber o que diz estás pronto(a) para a etapa seguinte. Avança porque estás no bom caminho!",ai:true,aiType:"vocab",tip:"💡 Podes ditar com o microfone do teclado — não precisas de escrever.",next:2},
+  {title:"03 Estruturar",checks:[
+    {text:"Enquanto lês, organiza o teu caderno começando por anotar a página que estás a ler.",note:"Mais tarde, se quiseres consultar alguma coisa no manual, sabes onde está."},
+    {text:"Começa a anotar os conceitos mais importantes.",note:"Não há uma forma certa. Usa a técnica que funciona melhor para ti.",techniques:[
+      "Escrevi as definições dos conceitos mais importantes",
+      "Fiz esquemas da matéria",
+      "Sublinhei no manual as palavras-chave",
+      "Fiz desenhos e legendas",
+      "Ditei para o telemóvel os conceitos mais importantes",
+      "Reescrevi com as minhas próprias palavras",
+      "Fiz um mapa mental",
+      "Outro"
+    ]}
+  ],criteria:"Os teus apontamentos estão todos organizados e percebe-se o fundamental.",ai:false,next:3},
+  {title:"04 Explicar",checks:[
+    {text:"Fecha os apontamentos e o manual. Não espreites.",note:"O teu cérebro só aprende mesmo quando é obrigado a trabalhar sozinho."},
+    {text:"Explica a matéria em voz alta como se estivesses a ensinar alguém.",note:"Não precisas de ninguém à frente. O teu peluche, o teu cão ou a parede servem perfeitamente.",techniques:[
+      "Filmei-me com o telemóvel",
+      "Expliquei a um familiar ou amigo",
+      "Expliquei em voz alta sozinho(a)",
+      "Escrevi como se estivesse a explicar a alguém",
+      "Outro"
+    ]},
+    {text:"Identifiquei os pontos onde hesitei ou não soube explicar.",note:"Esses são os teus pontos fracos. São ouro. É exactamente para isso que serve o passo seguinte."}
+  ],criteria:"Consegues explicar tudo sem olhar para os apontamentos. Se ainda hesitas nalgum ponto, volta atrás e estuda esse tema de novo. Só avança quando estiveres mesmo a conseguir!",ai:false,next:4},
+  {title:"05 Testar",checks:[
+    {text:"Pega nos exercícios do manual ou nos testes anteriores da disciplina.",note:"Testar a memória é a forma mais eficaz de consolidar o que aprendeste. Não é para ver se sabes. É para aprender mesmo."},
+    {text:"Faz os exercícios sem olhar para os apontamentos.",note:"Se não consegues responder, não espreites logo. Fica com o desconforto um momento. O teu cérebro está a trabalhar."},
+    {text:"Quando encontrares uma dúvida, segue esta ordem: primeiro os teus apontamentos, depois o manual (tens a página anotada, já sabes onde está). Se mesmo assim não perceberes, usa o chat em baixo.",note:"Não desesperes. A IA está aqui para isso. Mas tenta primeiro sozinho."},
+    {text:"Guarda os conceitos que falhaste como flashcard para reveres mais tarde.",note:"Os erros de hoje são os acertos de amanhã."}
+  ],criteria:"Consegues responder aos exercícios e perceber os teus erros. Não precisas de ter tudo certo. Precisas de perceber porquê erraste. Isso é estudar a sério.",ai:true,aiType:"sos",tip:"💡 Podes ditar a tua dúvida com o microfone do teclado.",next:-1}
+];
+
+const chatHist={};
+let currentStep=0;
+
+function toggleOutro(cb){
+  const inp = document.getElementById('outro-input');
+  if(inp) inp.style.display = cb.checked ? 'block' : 'none';
+}
+
+function updateChecks(stepIdx){
+  const s=STEPS[stepIdx];
+  if(!s.checks) return;
+  const total=s.checks.length;
+  const checked=s.checks.filter((_,ci)=>{
+    const el=document.getElementById(`chk-${stepIdx}-${ci}`);
+    return el&&el.checked;
+  }).length;
+  const nextBtn=document.querySelector('.next-btn');
+  if(nextBtn){
+    if(checked===total){
+      nextBtn.style.opacity='1';
+      nextBtn.style.pointerEvents='auto';
+    } else {
+      nextBtn.style.opacity='0.4';
+      nextBtn.style.pointerEvents='none';
+    }
+  }
+}
+
+function loadCards(){try{return JSON.parse(localStorage.getItem('skolita_fc')||'[]');}catch(e){return[];}}
+function saveCards(c){localStorage.setItem('skolita_fc',JSON.stringify(c));}
+function updateBadge(){document.getElementById('fc-count').textContent=loadCards().length;}
+function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');window.scrollTo(0,0);}
+function goHome(){showScreen('home');updateBadge();}
+function goDone(){showScreen('done');}
+
+function openStep(i){
+  currentStep=i;
+  chatHist[i]=[];
+  const s=STEPS[i];
+  const nums=['01','02','03','04','05'];
+  const names=['MAPEAR','LEITURA ATIVA','ESTRUTURAR','EXPLICAR','TESTAR'];
+  const svgIcons=['<svg width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><polygon points=\"3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21\"/><line x1=\"9\" y1=\"3\" x2=\"9\" y2=\"18\"/><line x1=\"15\" y1=\"6\" x2=\"15\" y2=\"21\"/></svg>','<svg width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z\"/><path d=\"M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z\"/></svg>','<svg width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><rect x=\"8\" y=\"2\" width=\"8\" height=\"4\" rx=\"1\"/><rect x=\"1\" y=\"17\" width=\"6\" height=\"4\" rx=\"1\"/><rect x=\"9\" y=\"17\" width=\"6\" height=\"4\" rx=\"1\"/><rect x=\"17\" y=\"17\" width=\"6\" height=\"4\" rx=\"1\"/><path d=\"M12 6v4\"/><path d=\"M4 17v-4a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v4\"/><line x1=\"12\" y1=\"10\" x2=\"12\" y2=\"12\"/></svg>','<svg width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z\"/><path d=\"M19 10v2a7 7 0 0 1-14 0v-2\"/><line x1=\"12\" y1=\"19\" x2=\"12\" y2=\"23\"/><line x1=\"8\" y1=\"23\" x2=\"16\" y2=\"23\"/></svg>','<svg width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M9 3h6\"/><path d=\"M10 3v6l-4.5 9A1 1 0 0 0 6.4 20h11.2a1 1 0 0 0 .9-1.45L14 9V3\"/><line x1=\"6.8\" y1=\"15\" x2=\"17.2\" y2=\"15\"/></svg>'];
+  const colors=['var(--blue)','var(--cyan)','var(--purple)','var(--orange)','var(--green)'];
+  const hero=document.getElementById('d-hero');
+  if(hero){hero.innerHTML=`<div style="display:flex;align-items:center;gap:12px"><div style="color:${colors[i]};flex-shrink:0">${svgIcons[i]}</div><div><div class="step-hero-num">Passo ${nums[i]}</div><div class="step-hero-title">${names[i]}</div></div></div>`;}
+  let h='';
+  if(s.checks){
+    h+=`<div class="info-card"><div class="info-card-label">O que fazer</div>`;
+    s.checks.forEach((c,ci)=>{
+      h+=`<div class="check-item" id="chk-wrap-${i}-${ci}">
+        <label class="check-label">
+          <input type="checkbox" class="check-box" onchange="updateChecks(${i})" id="chk-${i}-${ci}">
+          <span class="check-text">${c.text}</span>
+        </label>
+        ${c.note?`<div class="check-note">${c.note}</div>`:''}
+      </div>`;
+      if(c.techniques){
+        h+=`<div class="techniques-box"><div class="techniques-label">Marca as técnicas que usaste</div>`;
+        c.techniques.forEach((t,ti)=>{
+          const isOutro = t === 'Outro';
+          h+=`<label class="tech-label"><input type="checkbox" class="check-box" style="width:16px;height:16px" ${isOutro?'onchange="toggleOutro(this)"':''}> <span class="tech-text">${t}</span></label>`;
+          if(isOutro) h+=`<input type="text" id="outro-input" placeholder="Descreve a técnica que usaste..." style="display:none;margin-top:4px;margin-left:24px;width:calc(100% - 24px)">`;
+        });
+        h+=`</div>`;
+      }
+    });
+    h+=`</div>`;
+  } else {
+    h+=`<div class="info-card"><div class="info-card-label">O que fazer</div>${s.what.replace(/\n/g,'<br>')}</div>`;
+  }
+  if(s.ai){
+    h+=`<div class="tip-card">${s.tip}</div>`;
+    h+=`<div class="criteria-card" id="criteria-${i}"><div class="criteria-label">Quando avançar</div><div class="criteria-text">${s.criteria}</div></div>`;
+    h+=`<span class="field-label">Contexto</span>`;
+    h+=`<div class="fields-row">`;
+    h+=`<input type="text" id="f-subject" placeholder="Disciplina">`;
+    h+=`<input type="text" id="f-year" placeholder="Ano (ex: 8)">`;
+    h+=`</div>`;
+    if(s.aiType==='vocab'){
+      h+=`<span class="field-label" style="margin-top:1rem">Palavras com bolinha</span>`;
+      h+=`<textarea id="first-input" placeholder="Escreve as palavras separadas por vírgula&#10;Ex: litosfera, epicentro, magnitude" rows="3"></textarea>`;
+      h+=`<button class="ai-btn" id="start-btn" onclick="startChat(${i})">✦ Explicar palavras</button>`;
+      h+=`<div class="disc">A IA explica com linguagem adequada ao teu ano.</div>`;
+    } else {
+      h+=`<span class="field-label" style="margin-top:1rem">A tua dúvida</span>`;
+      h+=`<textarea id="first-input" placeholder="Ex: não percebo a ventilação pulmonar..." rows="3"></textarea>`;
+      h+=`<button class="ai-btn" id="start-btn" onclick="startChat(${i})">✦ Iniciar conversa</button>`;
+      h+=`<div class="disc">A IA enquadra a resposta no teu currículo.</div>`;
+    }
+    h+=`<div class="chat-section" id="chat-section">`;
+    h+=`<div class="chat-label">Conversa</div>`;
+    h+=`<div class="chat-messages" id="chat-messages"></div>`;
+    h+=`<div class="chat-input-row">`;
+    h+=`<textarea id="chat-input" placeholder="Responde ou faz outra pergunta..." rows="1" onkeydown="chatEnter(event)"></textarea>`;
+    h+=`<button class="send-btn" id="chat-send" onclick="sendChat()">➤</button>`;
+    h+=`</div></div>`;
+  } else {
+    h+=`<div class="criteria-card" id="criteria-${i}"><div class="criteria-label">Quando avançar</div><div class="criteria-text">${s.criteria}</div></div>`;
+    h+=`<div class="notes-wrap"><span class="field-label">As tuas notas</span><textarea id="notes" placeholder="${s.placeholder||''}"></textarea></div>`;
+  }
+
+  h+=`<div class="nav-btns">`;
+  const isLast=s.next===-1;
+  h+=`<button class="next-btn ${isLast?'last':''}" onclick="${isLast?'goDone()':'openStep('+s.next+')'}">${isLast?'Concluir ciclo ⚡':'Próximo passo →'}</button>`;
+  if(i>0) h+=`<button class="prev-btn" onclick="openStep(${i-1})">← Passo anterior</button>`;
+  h+=`</div>`;
+
+  document.getElementById('d-body').innerHTML=h;
+  showScreen('detail');
+}
+
+function getCtx(){
+  const sub=(document.getElementById('f-subject')||{}).value||'';
+  const yr=(document.getElementById('f-year')||{}).value||'';
+  return {sub,yr};
+}
+
+function buildSys(type,sub,yr){
+  const ctx=[yr?yr+'.º ano':'',sub?'de '+sub:''].filter(Boolean).join(' ')||'escolar';
+  if(type==='vocab'){
+    const yrNum = parseInt(yr)||0;
+    let nivelV = '';
+    if(yrNum>=5&&yrNum<=6) nivelV='Explica como se falavas com uma criança de 10-11 anos. Palavras simples, frases muito curtas, exemplos do quotidiano.';
+    else if(yrNum>=7&&yrNum<=9) nivelV='Explica de forma simples e direta para adolescentes de 12-15 anos. Usa exemplos concretos.';
+    else if(yrNum>=10&&yrNum<=12) nivelV='Explica com rigor adequado a jovens de 16-18 anos. Podes usar linguagem mais técnica.';
+    else nivelV='Usa linguagem simples e clara.';
+    return `És um explicador de vocabulário para alunos do ensino básico e secundário português de Portugal.\nUsa SEMPRE português europeu de Portugal. NUNCA uses expressões, vocabulário ou gramática do português do Brasil.\nO aluno é do ${ctx}.\nNível de linguagem: ${nivelV}\nRegras:\n- Explica cada palavra pela ordem enviada\n- Coloca cada palavra a negrito usando **palavra**\n- Dá o significado geral em português claro e direto\n- Se a palavra tiver significado específico no currículo do ${ctx} e nas Aprendizagens Essenciais, acrescenta esse significado\n- No fim, pergunta apenas se há alguma palavra que não ficou clara`;
+  } else {
+    const yrNum = parseInt(yr)||0;
+    let nivel = '';
+    if(yrNum>=5&&yrNum<=6) nivel='Usa linguagem muito simples, frases curtas, palavras do dia a dia, como se explicasses a uma criança de 10-11 anos. Evita termos técnicos — se os usares, explica-os logo.';
+    else if(yrNum>=7&&yrNum<=9) nivel='Usa linguagem simples e direta, adequada a adolescentes de 12-15 anos. Podes usar alguns termos técnicos mas explica-os sempre com exemplos concretos.';
+    else if(yrNum>=10&&yrNum<=12) nivel='Usa linguagem mais rigorosa e técnica, adequada a jovens de 16-18 anos a preparar exames. Podes assumir conhecimentos base e aprofundar os conceitos.';
+    else nivel='Usa linguagem simples e clara, adequada ao nível de ensino básico ou secundário.';
+    return `INSTRUÇÃO CRÍTICA: Responde EXCLUSIVAMENTE em português europeu de Portugal. É absolutamente proibido usar português do Brasil. Exemplos obrigatórios: "casa de banho" (nunca "banheiro"), "autocarro" (nunca "ônibus"), "telemóvel" (nunca "celular"), "fixe" (nunca "legal"), "miúdo" (nunca "garoto"), "a seguir" (nunca "em seguida"), "está bem" (nunca "tá bom").\n\nÉs um explicador de dúvidas escolares para alunos do ${ctx} em Portugal.\nNível de linguagem: ${nivel}\nAbordagem:\n1. Dá uma explicação clara, direta e enquadrada nas Aprendizagens Essenciais do currículo português do ${ctx}\n2. Usa um exemplo concreto do dia a dia adequado à faixa etária\n3. Termina SEMPRE com uma sugestão de como esquematizar o conceito no caderno (ex: diagrama, seta, tabela, mapa de ideias)\n4. Faz UMA única pergunta curta para verificar se o aluno percebeu\nRegras:\n- Nunca faças mais do que uma pergunta por resposta\n- Respostas curtas e diretas\n- Linguagem próxima e encorajadora\n- Se o aluno confirmar que percebeu, sugere guardar como flashcard e termina a conversa`;
+  }
+}
+
+async function startChat(stepIdx){
+  const input=(document.getElementById('first-input')||{}).value.trim();
+  if(!input){alert('Escreve primeiro o que precisas.');return;}
+  const {sub,yr}=getCtx();
+  const sys=buildSys(STEPS[stepIdx].aiType,sub,yr);
+  document.getElementById('start-btn').style.display='none';
+  document.getElementById('chat-section').style.display='block';
+  chatHist[stepIdx]=[];
+  appendMsg('user',input);
+  chatHist[stepIdx].push({role:'user',content:input});
+  await aiReply(stepIdx,sys);
+}
+
+function chatEnter(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendChat();}}
+
+async function sendChat(){
+  const inp=document.getElementById('chat-input');
+  if(!inp)return;
+  const text=inp.value.trim();
+  if(!text)return;
+  inp.value='';
+  const i=currentStep;
+  const {sub,yr}=getCtx();
+  const sys=buildSys(STEPS[i].aiType,sub,yr);
+  appendMsg('user',text);
+  chatHist[i].push({role:'user',content:text});
+  await aiReply(i,sys);
+}
+
+async function aiReply(stepIdx,sys){
+  const sendBtn=document.getElementById('chat-send');
+  if(sendBtn)sendBtn.disabled=true;
+  const typingId='t'+Date.now();
+  appendMsg('ai','A pensar...',typingId,true);
+  try{
+    const r=await fetch('/.netlify/functions/chat',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({system:sys,messages:chatHist[stepIdx]})
+    });
+    if(!r.ok){
+      const errData=await r.json().catch(()=>({}));
+      if(errData.error==='unavailable') throw new Error('O assistente está temporariamente indisponível. Tenta mais tarde.');
+      throw new Error('Não foi possível obter resposta. Verifica a tua ligação e tenta de novo.');
+    }
+    const data=await r.json();
+    const text=data.content?.filter(b=>b.type==='text').map(b=>b.text).join('')||'Não consegui responder. Tenta de novo.';
+    chatHist[stepIdx].push({role:'assistant',content:text});
+    removeMsg(typingId);
+    appendMsg('ai',text,null,false,true);
+  }catch(e){
+    removeMsg(typingId);
+    appendMsg('ai','Erro de ligação: '+e.message);
+  }
+  if(sendBtn)sendBtn.disabled=false;
+  scrollChat();
+}
+
+function appendMsg(role,text,id,typing,showFC){
+  const wrap=document.getElementById('chat-messages');
+  if(!wrap)return;
+  const div=document.createElement('div');
+  div.className=`msg msg-${role}${typing?' msg-typing':''}`;
+  if(id)div.id=id;
+  div.innerHTML=text.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');
+  if(showFC&&role==='ai'){
+    const fc=document.createElement('div');
+    fc.className='fc-suggest';
+    fc.innerHTML='🃏 Guardar como flashcard';
+    fc.onclick=()=>saveFromChat(text,fc);
+    div.appendChild(document.createElement('br'));
+    div.appendChild(fc);
+  }
+  wrap.appendChild(div);
+  scrollChat();
+}
+
+function removeMsg(id){const el=document.getElementById(id);if(el)el.remove();}
+function scrollChat(){
+  const w=document.getElementById('chat-messages');
+  if(w)w.scrollTop=w.scrollHeight;
+  setTimeout(()=>{const i=document.getElementById('chat-input');if(i)i.scrollIntoView({behavior:'smooth',block:'nearest'});},100);
+}
+
+function saveFromChat(text,btn){
+  const hist=chatHist[currentStep]||[];
+  const lastUser=hist.slice().reverse().find(m=>m.role==='user');
+  const concept=lastUser?lastUser.content.slice(0,100):text.slice(0,100);
+  const cards=loadCards();
+  cards.unshift({id:Date.now(),concept,answer:text.replace(/\*\*(.*?)\*\*/g,'$1'),date:new Date().toLocaleDateString('pt-PT')});
+  saveCards(cards);
+  updateBadge();
+  btn.innerHTML='✓ Guardado!';
+  btn.style.color='var(--green)';
+  btn.style.borderColor='rgba(16,185,129,0.3)';
+  btn.onclick=null;
+}
+
+function openReview(){
+  const cards=loadCards();
+  const list=document.getElementById('fc-list');
+  if(cards.length===0){
+    list.innerHTML=`<div class="fc-empty"><span class="fc-empty-icon">🃏</span>Ainda não tens flashcards.<br>Usa a IA nos passos 2 e 5<br>e guarda as explicações.</div>`;
+  }else{
+    list.innerHTML=cards.map(c=>`
+      <div class="fc-card" id="fc-${c.id}">
+        <div class="fc-concept">${c.concept}</div>
+        <div class="fc-date">${c.date}</div>
+        <div class="fc-answer-box" id="fca-${c.id}">${c.answer||'Sem explicação.'}</div>
+        <div class="fc-actions" id="fcact-${c.id}">
+          <button class="fc-btn" style="flex:2" onclick="revealCard(${c.id})">👁 Ver explicação</button>
+          <button class="fc-btn fc-btn-del" onclick="deleteCard(${c.id})">🗑</button>
+        </div>
+      </div>`).join('');
+  }
+  showScreen('review');
+}
+
+function revealCard(id){
+  document.getElementById('fca-'+id).style.display='block';
+  document.getElementById('fcact-'+id).innerHTML=`
+    <button class="fc-btn fc-btn-ok" onclick="markCard(${id},'ok')">✓ Sei</button>
+    <button class="fc-btn fc-btn-no" onclick="markCard(${id},'no')">↺ Ainda não sei</button>
+    <button class="fc-btn fc-btn-del" onclick="deleteCard(${id})">🗑</button>`;
+}
+
+function markCard(id,result){
+  if(result==='ok'){deleteCard(id);}
+  else{
+    const el=document.getElementById('fc-'+id);
+    if(el)el.style.borderColor='rgba(249,115,22,0.4)';
+    document.getElementById('fcact-'+id).innerHTML=`
+      <span class="fc-pending">↺ Para rever de novo</span>
+      <button class="fc-btn fc-btn-del" style="margin-left:auto;max-width:44px" onclick="deleteCard(${id})">🗑</button>`;
+  }
+}
+
+function deleteCard(id){
+  saveCards(loadCards().filter(c=>c.id!==id));
+  updateBadge();
+  const el=document.getElementById('fc-'+id);
+  if(el)el.remove();
+  if(loadCards().length===0)openReview();
+}
+
+updateBadge();
+</script>
+</body>
+</html>
