@@ -603,6 +603,8 @@ function updateChecks(stepIdx){
       nextBtn.style.background='linear-gradient(135deg,#3B82F6,#A855F7)';
       nextBtn.style.color='#FFF';
       nextBtn.style.borderColor='transparent';
+      const hint=document.getElementById('checks-hint');
+      if(hint) hint.style.display='none';
       showCelebration(stepIdx);
       setTimeout(()=>{
         const box=document.getElementById('celebration-box');
@@ -711,6 +713,7 @@ function openStep(i){
   h+=`<div class="celebration-box" id="celebration-box"><span class="celebration-emoji"></span><div class="celebration-title"></div><div class="celebration-msg"></div></div>`;
   h+=`<div class="nav-btns">`;
   h+=`<button class="next-btn ${isLast?'last':''}" id="next-btn" style="${hasChecks?'opacity:0.35;pointer-events:none':''}" onclick="${isLast?'goDone()':'openStep('+s.next+')'}">${isLast?'Concluir ciclo ⚡':'Próximo passo →'}</button>`;
+  if(hasChecks) h+=`<div id="checks-hint" style="text-align:center;font-size:12px;color:var(--text-ter);font-weight:500;margin-top:6px">Marca todos os pontos para avançar 💪</div>`;
   if(i>0) h+=`<button class="prev-btn" onclick="openStep(${i-1})">← Passo anterior</button>`;
   h+=`</div>`;
   document.getElementById('d-body').innerHTML=h;
