@@ -414,7 +414,7 @@ textarea { resize:vertical; min-height:72px; }
 <script>
 const STEPS=[
   {title:"01 Mapear",checks:[
-    {text:"Abre o livro e folheia, do início ao fim, da matéria a estudar.",note:"Agora o teu cérebro já tem uma ideia geral do que terá de fazer."},
+    {text:"Abre o livro e folheia, do início ao fim, a matéria a estudar.",note:"Agora o teu cérebro já tem uma ideia geral do que terá de fazer."},
     {text:"No teu caderno faz uma lista dos títulos e subtítulos, colocando a página em que se encontram.",note:"Parabéns! Acabaste de criar um mapa que te guiará ao longo do estudo. Ainda não estás a estudar mas o teu cérebro acha que sim."},
     {text:"Divide a lista, que criaste, em blocos e escolhe o bloco que vais estudar agora.",note:"A tua sessão de estudo não deve ter mais do que 30 a 45 minutos sem um intervalo de 10 minutos entre sessões. Estudar tudo de uma vez não funciona. O teu cérebro consolida melhor em sessões curtas."}
   ],criteria:"Tens a lista dos títulos e o bloco escolhido. O mapa está nas tuas mãos. Já não te perdes!",ai:false,next:1},
@@ -713,7 +713,7 @@ function openStep(i){
   h+=`<div class="celebration-box" id="celebration-box"><span class="celebration-emoji"></span><div class="celebration-title"></div><div class="celebration-msg"></div></div>`;
   h+=`<div class="nav-btns">`;
   h+=`<button class="next-btn ${isLast?'last':''}" id="next-btn" style="${hasChecks?'opacity:0.35;pointer-events:none':''}" onclick="${isLast?'goDone()':'openStep('+s.next+')'}">${isLast?'Concluir ciclo ⚡':'Próximo passo →'}</button>`;
-  if(hasChecks) h+=`<div id="checks-hint" style="text-align:center;font-size:12px;color:var(--text-ter);font-weight:500;margin-top:6px">Marca todos os pontos para avançar 💪</div>`;
+  if(hasChecks) h+=`<div id="checks-hint" style="text-align:center;font-size:13px;color:var(--orange);font-weight:600;margin-top:8px;padding:8px;background:var(--orange-dim);border-radius:var(--rsm)">Marca todos os pontos para avançar 💪</div>`;
   if(i>0) h+=`<button class="prev-btn" onclick="openStep(${i-1})">← Passo anterior</button>`;
   h+=`</div>`;
   document.getElementById('d-body').innerHTML=h;
