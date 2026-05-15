@@ -181,6 +181,33 @@ textarea { resize:vertical; min-height:72px; }
 @keyframes spin { to{transform:rotate(360deg)} }
 .spin { display:inline-block; width:15px; height:15px; border:2px solid rgba(255,255,255,0.3); border-top-color:#FFF; border-radius:50%; animation:spin 0.7s linear infinite; }
 
+/* CELEBRATION */
+@keyframes celebIn { from{opacity:0;transform:translateY(10px) scale(0.95)} to{opacity:1;transform:none} }
+@keyframes confettiFall { 0%{transform:translateY(0) rotate(0deg);opacity:1} 100%{transform:translateY(100vh) rotate(720deg);opacity:0} }
+@keyframes burst { 0%{transform:translate(-50%,-50%) scale(0);opacity:1} 60%{opacity:1} 100%{transform:translate(calc(-50% + var(--tx)),calc(-50% + var(--ty))) scale(1);opacity:0} }
+.celebration-box { background:linear-gradient(135deg,var(--blue-dim),var(--purple-dim)); border:1px solid rgba(168,85,247,0.3); border-radius:var(--r); padding:1rem 1.1rem; margin-top:1rem; animation:celebIn 0.3s ease; display:none; text-align:center; position:relative; overflow:visible; }
+.celebration-emoji { font-size:32px; display:block; margin-bottom:6px; }
+.celebration-title { font-family:'Space Mono',monospace; font-size:16px; font-weight:700; background:linear-gradient(135deg,var(--blue),var(--cyan),var(--purple)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; margin-bottom:4px; }
+.celebration-msg { font-size:13px; color:var(--text-sec); font-weight:500; }
+.confetti { position:absolute; width:8px; height:8px; border-radius:2px; animation:confettiFall 1s ease forwards; }
+
+/* STREAK */
+.streak-banner { background:linear-gradient(135deg,rgba(249,115,22,0.15),rgba(251,191,36,0.1)); border:1px solid rgba(249,115,22,0.3); border-radius:var(--r); padding:0.75rem 1rem; margin:0 1.2rem 1rem; display:flex; align-items:center; gap:10px; }
+.streak-fire { font-size:22px; }
+.streak-text { flex:1; }
+.streak-num { font-family:'Space Mono',monospace; font-size:18px; font-weight:700; color:var(--orange); }
+.streak-label { font-size:12px; color:var(--text-sec); font-weight:500; }
+
+/* SESSION STATS */
+.stats-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-bottom:1.5rem; }
+.stat-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--rsm); padding:0.75rem; text-align:center; }
+.stat-num { font-family:'Space Mono',monospace; font-size:22px; font-weight:700; background:linear-gradient(135deg,var(--blue),var(--cyan)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+.stat-label { font-size:11px; color:var(--text-ter); font-weight:600; text-transform:uppercase; letter-spacing:0.05em; margin-top:3px; }
+
+/* SHARE */
+.share-btn { width:100%; padding:13px; border:none; border-radius:var(--rsm); background:linear-gradient(135deg,var(--cyan),var(--blue)); color:#FFF; font-size:14px; font-weight:700; cursor:pointer; font-family:'Space Grotesk',sans-serif; transition:opacity 0.15s; display:flex; align-items:center; justify-content:center; gap:8px; margin-bottom:10px; }
+.share-btn:hover { opacity:0.88; }
+
 /* DECORATIVE CIRCLES */
 .deco { position:absolute; pointer-events:none; z-index:0; inset:0; overflow:hidden; }
 .deco svg { position:absolute; top:0; left:0; width:100%; height:100%; }
@@ -262,6 +289,13 @@ textarea { resize:vertical; min-height:72px; }
     </svg>
 
     <p class="home-sub">OS 5 PASSOS QUE MUDAM A FORMA COMO ESTUDAS.</p>
+  </div>
+  <div class="streak-banner" id="streak-banner">
+    <div class="streak-fire">🔥</div>
+    <div class="streak-text">
+      <div class="streak-num" id="streak-num">0</div>
+      <div class="streak-label">dias consecutivos</div>
+    </div>
   </div>
   <button class="review-banner" onclick="openReview()">
     <div style="font-size:22px">🃏</div>
@@ -364,7 +398,13 @@ textarea { resize:vertical; min-height:72px; }
     <span class="done-icon">⚡</span>
     <div class="done-title">CICLO COMPLETO</div>
     <p class="done-text">Fizeste os 5 passos.<br>Estudaste com método — não com sorte.</p>
+    <div class="stats-grid" id="session-stats">
+      <div class="stat-card"><div class="stat-num" id="stat-flashcards">0</div><div class="stat-label">Flashcards</div></div>
+      <div class="stat-card"><div class="stat-num" id="stat-ai">0</div><div class="stat-label">Perguntas IA</div></div>
+      <div class="stat-card"><div class="stat-num" id="stat-time">0m</div><div class="stat-label">Tempo</div></div>
+    </div>
     <div class="done-btns">
+      <button class="share-btn" onclick="shareSession()">🚀 Partilhar conquista</button>
       <button class="done-primary" onclick="openReview()">Ver flashcards para rever</button>
       <button class="done-sec" onclick="goHome()">Recomeçar</button>
     </div>
@@ -375,17 +415,17 @@ textarea { resize:vertical; min-height:72px; }
 const STEPS=[
   {title:"01 Mapear",checks:[
     {text:"Abre o livro e folheia, do início ao fim, da matéria a estudar.",note:"Agora o teu cérebro já tem uma ideia geral do que terá de fazer."},
-    {text:"No teu caderno faz uma lista de títulos e subtítulos que vais encontrando e coloca a página em que se encontram.",note:"Parabéns! Acabaste de criar um mapa que te guiará ao longo do estudo. Ainda não estás a estudar mas o teu cérebro acha que sim."}
-  ],criteria:"Com a lista feita, avança para o próximo passo. O mapa está nas tuas mãos. Já não te perdes!",ai:false,next:1},
+    {text:"No teu caderno faz uma lista dos títulos e subtítulos, colocando a página em que se encontram.",note:"Parabéns! Acabaste de criar um mapa que te guiará ao longo do estudo. Ainda não estás a estudar mas o teu cérebro acha que sim."},
+    {text:"Divide a lista, que criaste, em blocos e escolhe o bloco que vais estudar agora.",note:"A tua sessão de estudo não deve ter mais do que 30 a 45 minutos sem um intervalo de 10 minutos entre sessões. Estudar tudo de uma vez não funciona. O teu cérebro consolida melhor em sessões curtas."}
+  ],criteria:"Tens a lista dos títulos e o bloco escolhido. O mapa está nas tuas mãos. Já não te perdes!",ai:false,next:1},
   {title:"02 Leitura ativa",checks:[
     {text:"Lê o texto devagar colocando uma bolinha em cima de todas as palavras que não conheces.",note:"Se tiveres muitas bolinhas é impossível compreenderes a mensagem do texto. Mas temos a solução!"},
-    {text:"Na caixa em baixo escreve a disciplina e ano que estás a estudar.",note:null},
-    {text:"A seguir coloca todas as palavras que não conheces na caixa <span style=\"color:var(--cyan);font-weight:700\">Palavras com bolinha</span>.",note:"A IA explica e responde às tuas dúvidas."},
-    {text:"Fiz uma segunda leitura do texto com compreensão total.",note:null}
-  ],criteria:"Se já consegues ler o texto e perceber o que diz estás pronto(a) para a etapa seguinte. Avança porque estás no bom caminho!",ai:true,aiType:"vocab",tip:"💡 Podes ditar com o microfone do teclado — não precisas de escrever.",next:2},
+    {text:"Em baixo escreve a disciplina e ano que estás a estudar. De seguida coloca todas as palavras que não conheces na caixa <span style=\"color:var(--cyan);font-weight:700\">Palavras com bolinha</span>.",note:"Podes guardar os significados como <span style='color:var(--cyan);font-weight:700'>flashcard</span> para reveres mais tarde."},
+    {text:"Faz uma segunda leitura do texto com compreensão total.",note:null}
+  ],criteria:"Se já consegues ler o texto e perceber o que diz estás pronto(a) para a etapa seguinte. Avança porque estás no bom caminho!",ai:true,aiType:"vocab",tip:"💡 Podes ditar com o microfone do teclado — não precisas de escrever. Sabendo o ano e disciplina a IA dará os significados das palavras à tua medida.",next:2},
   {title:"03 Estruturar",checks:[
-    {text:"Enquanto lês, organiza o teu caderno começando por anotar a página que estás a ler.",note:"Mais tarde, se quiseres consultar alguma coisa no manual, sabes onde está."},
-    {text:"Começa a anotar os conceitos mais importantes.",note:"Não há uma forma certa. Usa a técnica que funciona melhor para ti.",techniques:[
+    {text:"Enquanto lês, inicia o registo no teu caderno colocando a página que estás a ler.",note:"Mais tarde, se quiseres consultar alguma coisa no manual, sabes onde está."},
+    {text:"Começa a organizar e a registar os conceitos mais importantes.",note:"Não há uma forma certa. Usa a técnica que funciona melhor para ti.",techniques:[
       "Escrevi as definições dos conceitos mais importantes",
       "Fiz esquemas da matéria",
       "Sublinhei no manual as palavras-chave",
@@ -397,8 +437,8 @@ const STEPS=[
     ]}
   ],criteria:"Os teus apontamentos estão todos organizados e percebe-se o fundamental.",ai:false,next:3},
   {title:"04 Explicar",checks:[
-    {text:"Fecha os apontamentos e o manual. Não espreites.",note:"O teu cérebro só aprende mesmo quando é obrigado a trabalhar sozinho."},
-    {text:"Explica a matéria em voz alta como se estivesses a ensinar alguém.",note:"Não precisas de ninguém à frente. O teu peluche, o teu cão ou a parede servem perfeitamente.",techniques:[
+    {text:"Fecha os apontamentos e o manual.",note:"O teu cérebro só aprende quando é obrigado a trabalhar sozinho."},
+    {text:"Explica a matéria em voz alta como se estivesses a ensinar alguém.",note:"Não precisas de ninguém à frente. A tua família, um colega ou a parede servem perfeitamente.",techniques:[
       "Filmei-me com o telemóvel",
       "Expliquei a um familiar ou amigo",
       "Expliquei em voz alta sozinho(a)",
@@ -406,17 +446,141 @@ const STEPS=[
       "Outro"
     ]},
     {text:"Identifiquei os pontos onde hesitei ou não soube explicar.",note:"Esses são os teus pontos fracos. São ouro. É exactamente para isso que serve o passo seguinte."}
-  ],criteria:"Consegues explicar tudo sem olhar para os apontamentos. Se ainda hesitas nalgum ponto, volta atrás e estuda esse tema de novo. Só avança quando estiveres mesmo a conseguir!",ai:false,next:4},
+  ],criteria:"Consegues explicar tudo sem olhar para os apontamentos. Se ainda hesitas nalgum ponto, volta atrás e estuda esse tema de novo. Só avanças quando estiveres mesmo a conseguir!",ai:false,next:4},
   {title:"05 Testar",checks:[
     {text:"Pega nos exercícios do manual ou nos testes anteriores da disciplina.",note:"Testar a memória é a forma mais eficaz de consolidar o que aprendeste. Não é para ver se sabes. É para aprender mesmo."},
     {text:"Faz os exercícios sem olhar para os apontamentos.",note:"Se não consegues responder, não espreites logo. Fica com o desconforto um momento. O teu cérebro está a trabalhar."},
-    {text:"Quando encontrares uma dúvida, segue esta ordem: primeiro os teus apontamentos, depois o manual (tens a página anotada, já sabes onde está). Se mesmo assim não perceberes, usa o chat em baixo.",note:"Não desesperes. A IA está aqui para isso. Mas tenta primeiro sozinho."},
-    {text:"Guarda os conceitos que falhaste como flashcard para reveres mais tarde.",note:"Os erros de hoje são os acertos de amanhã."}
+    {text:"Quando encontrares uma dúvida, segue esta ordem: primeiro os teus <span style=\"color:var(--cyan);font-weight:700\">apontamentos</span>, depois o <span style=\"color:var(--cyan);font-weight:700\">manual</span> (tens a página anotada, já sabes onde está). Se mesmo assim não perceberes usa o <span style=\"color:var(--cyan);font-weight:700\">chat de IA</span> em baixo.",note:"Não desesperes, esta IA foi programada para te ajudar e vai explicar as tuas dúvidas."},
+    {text:"Guarda os conceitos que falhaste como <span style=\"color:var(--cyan);font-weight:700\">flashcard</span> para reveres mais tarde.",note:"Os erros de hoje são os acertos de amanhã."}
   ],criteria:"Consegues responder aos exercícios e perceber os teus erros. Não precisas de ter tudo certo. Precisas de perceber porquê erraste. Isso é estudar a sério.",ai:true,aiType:"sos",tip:"💡 Podes ditar a tua dúvida com o microfone do teclado.",next:-1}
 ];
 
 const chatHist={};
 let currentStep=0;
+
+// SESSION TRACKING
+let sessionStart = Date.now();
+let sessionAIQuestions = 0;
+let sessionFlashcards = 0;
+
+// STREAK
+function getStreak(){
+  try{
+    const data = JSON.parse(localStorage.getItem('skolita_streak')||'{"count":0,"lastDate":""}');
+    return data;
+  }catch(e){return {count:0,lastDate:''};}
+}
+function updateStreak(){
+  const today = new Date().toLocaleDateString('pt-PT');
+  const s = getStreak();
+  if(s.lastDate === today) return s.count;
+  const yesterday = new Date(Date.now()-86400000).toLocaleDateString('pt-PT');
+  const newCount = s.lastDate === yesterday ? s.count + 1 : 1;
+  localStorage.setItem('skolita_streak', JSON.stringify({count:newCount, lastDate:today}));
+  return newCount;
+}
+function renderStreak(){
+  const s = getStreak();
+  const el = document.getElementById('streak-num');
+  if(el) el.textContent = s.count;
+  const banner = document.getElementById('streak-banner');
+  if(banner) banner.style.display = s.count > 0 ? 'flex' : 'none';
+}
+
+// CELEBRATION
+const celebrations = [
+  {emoji:"🗺️", title:"MAPA CRIADO!", msg:"O teu cérebro já sabe o que vai encontrar. Estás no caminho certo!"},
+  {emoji:"👁️", title:"LEITURA CONCLUÍDA!", msg:"Não há palavras desconhecidas a travar-te. Avança com confiança!"},
+  {emoji:"🧠", title:"ESTRUTURA FEITA!", msg:"Organizaste o conhecimento. O teu caderno é agora uma ferramenta poderosa!"},
+  {emoji:"🎤", title:"EXPLICAÇÃO COMPLETA!", msg:"Se consegues explicar, sabes mesmo. O teu cérebro está a trabalhar!"},
+  {emoji:"⚡", title:"CICLO COMPLETO!", msg:"Fizeste os 5 passos. Estudaste com método. Agora vai descansar — o teu cérebro está a trabalhar."}
+];
+
+function fireworkBurst(x, y, count, small){
+  const colors = ['#3B82F6','#06B6D4','#A855F7','#F97316','#10B981','#FBBF24'];
+  for(let i=0;i<count;i++){
+    const dot = document.createElement('div');
+    const angle = (i/count)*Math.PI*2;
+    const dist = small ? (20+Math.random()*30) : (50+Math.random()*80);
+    const tx = Math.cos(angle)*dist;
+    const ty = Math.sin(angle)*dist;
+    const size = small ? (3+Math.random()*4) : (5+Math.random()*7);
+    dot.style.cssText = `
+      position:fixed;left:${x}px;top:${y}px;
+      width:${size}px;height:${size}px;
+      border-radius:50%;
+      background:${colors[i%colors.length]};
+      pointer-events:none;z-index:9999;
+      --tx:${tx}px;--ty:${ty}px;
+      animation:burst ${small?0.6:0.9}s ease ${Math.random()*0.2}s forwards;
+    `;
+    document.body.appendChild(dot);
+    setTimeout(()=>dot.remove(), small?900:1200);
+  }
+}
+
+function showCelebration(stepIdx){
+  const c = celebrations[stepIdx];
+  const box = document.getElementById('celebration-box');
+  if(!box) return;
+  box.querySelector('.celebration-emoji').textContent = c.emoji;
+  box.querySelector('.celebration-title').textContent = c.title;
+  box.querySelector('.celebration-msg').textContent = c.msg;
+  box.style.display = 'block';
+  // fireworks full screen
+  const w = window.innerWidth;
+  const h = window.innerHeight;
+  setTimeout(()=>{
+    fireworkBurst(w*0.3, h*0.4, 14, false);
+    setTimeout(()=>fireworkBurst(w*0.7, h*0.3, 14, false), 180);
+    setTimeout(()=>fireworkBurst(w*0.5, h*0.5, 14, false), 360);
+  }, 100);
+}
+
+// SHARE
+function shareSession(){
+  const streak = getStreak().count;
+  const fc = sessionFlashcards;
+  const text = `Completei o método SKOLITA hoje! 🚀\n${fc} flashcards criados${streak>1?' • '+streak+' dias seguidos 🔥':''} \n\nskolita.com`;
+  if(navigator.share){
+    navigator.share({title:'SKOLITA', text, url:'https://skolita.com'}).catch(()=>{});
+  } else {
+    navigator.clipboard.writeText(text).then(()=>alert('Texto copiado! Cola nas tuas redes sociais.'));
+  }
+}
+
+// DONE STATS
+function goDone(){
+  updateStreak();
+  renderStreak();
+  const elapsed = Math.round((Date.now()-sessionStart)/60000);
+  const fcEl = document.getElementById('stat-flashcards');
+  const aiEl = document.getElementById('stat-ai');
+  const timeEl = document.getElementById('stat-time');
+  if(fcEl) fcEl.textContent = sessionFlashcards;
+  if(aiEl) aiEl.textContent = sessionAIQuestions;
+  if(timeEl) timeEl.textContent = elapsed+'m';
+  showScreen('done');
+  setTimeout(launchConfetti, 300);
+}
+
+function launchConfetti(){
+  const w = window.innerWidth;
+  const h = window.innerHeight;
+  // multiple bursts across screen
+  const positions = [
+    [w*0.2, h*0.3],[w*0.5, h*0.2],[w*0.8, h*0.3],
+    [w*0.3, h*0.5],[w*0.7, h*0.5],[w*0.5, h*0.4]
+  ];
+  positions.forEach(([x,y],i)=>{
+    setTimeout(()=>fireworkBurst(x, y, 20, false), i*150);
+  });
+  setTimeout(()=>{
+    positions.forEach(([x,y],i)=>{
+      setTimeout(()=>fireworkBurst(x+30, y-20, 15, false), i*100);
+    });
+  }, 600);
+}
 
 function toggleOutro(cb){
   const inp = document.getElementById('outro-input');
@@ -428,17 +592,28 @@ function updateChecks(stepIdx){
   if(!s.checks) return;
   const total=s.checks.length;
   const checked=s.checks.filter((_,ci)=>{
-    const el=document.getElementById(`chk-${stepIdx}-${ci}`);
+    const el=document.getElementById('chk-'+stepIdx+'-'+ci);
     return el&&el.checked;
   }).length;
-  const nextBtn=document.querySelector('.next-btn');
+  const nextBtn=document.getElementById('next-btn');
   if(nextBtn){
     if(checked===total){
       nextBtn.style.opacity='1';
       nextBtn.style.pointerEvents='auto';
+      nextBtn.style.background='linear-gradient(135deg,#3B82F6,#A855F7)';
+      nextBtn.style.color='#FFF';
+      nextBtn.style.borderColor='transparent';
+      showCelebration(stepIdx);
+      setTimeout(()=>{
+        const box=document.getElementById('celebration-box');
+        if(box) box.scrollIntoView({behavior:'smooth',block:'center'});
+      },100);
     } else {
-      nextBtn.style.opacity='0.4';
+      nextBtn.style.opacity='0.35';
       nextBtn.style.pointerEvents='none';
+      nextBtn.style.background='';
+      nextBtn.style.color='';
+      nextBtn.style.borderColor='';
     }
   }
 }
@@ -447,8 +622,9 @@ function loadCards(){try{return JSON.parse(localStorage.getItem('skolita_fc')||'
 function saveCards(c){localStorage.setItem('skolita_fc',JSON.stringify(c));}
 function updateBadge(){document.getElementById('fc-count').textContent=loadCards().length;}
 function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');window.scrollTo(0,0);}
-function goHome(){showScreen('home');updateBadge();}
-function goDone(){showScreen('done');}
+function goHome(){showScreen('home');updateBadge();
+renderStreak();}
+
 
 function openStep(i){
   currentStep=i;
@@ -463,7 +639,9 @@ function openStep(i){
   let h='';
   if(s.checks){
     h+=`<div class="info-card"><div class="info-card-label">O que fazer</div>`;
-    s.checks.forEach((c,ci)=>{
+    const checksBeforeAI = s.aiType==='vocab' ? s.checks.slice(0,-1) : s.checks;
+    const lastCheck = s.aiType==='vocab' ? s.checks[s.checks.length-1] : null;
+    checksBeforeAI.forEach((c,ci)=>{
       h+=`<div class="check-item" id="chk-wrap-${i}-${ci}">
         <label class="check-label">
           <input type="checkbox" class="check-box" onchange="updateChecks(${i})" id="chk-${i}-${ci}">
@@ -487,6 +665,18 @@ function openStep(i){
   }
   if(s.ai){
     h+=`<div class="tip-card">${s.tip}</div>`;
+    // For vocab steps, add last checkbox here (between tip and criteria)
+    if(s.aiType==='vocab' && s.checks && s.checks.length>0){
+      const lastC=s.checks[s.checks.length-1];
+      const lastCi=s.checks.length-1;
+      h+=`<div class="check-item" id="chk-wrap-${i}-${lastCi}" style="margin-top:0.5rem">
+        <label class="check-label">
+          <input type="checkbox" class="check-box" onchange="updateChecks(${i})" id="chk-${i}-${lastCi}">
+          <span class="check-text">${lastC.text}</span>
+        </label>
+        ${lastC.note?`<div class="check-note">${lastC.note}</div>`:''}
+      </div>`;
+    }
     h+=`<div class="criteria-card" id="criteria-${i}"><div class="criteria-label">Quando avançar</div><div class="criteria-text">${s.criteria}</div></div>`;
     h+=`<span class="field-label">Contexto</span>`;
     h+=`<div class="fields-row">`;
@@ -516,13 +706,15 @@ function openStep(i){
     h+=`<div class="notes-wrap"><span class="field-label">As tuas notas</span><textarea id="notes" placeholder="${s.placeholder||''}"></textarea></div>`;
   }
 
-  h+=`<div class="nav-btns">`;
   const isLast=s.next===-1;
-  h+=`<button class="next-btn ${isLast?'last':''}" onclick="${isLast?'goDone()':'openStep('+s.next+')'}">${isLast?'Concluir ciclo ⚡':'Próximo passo →'}</button>`;
+  const hasChecks=!!(s.checks&&s.checks.length);
+  h+=`<div class="celebration-box" id="celebration-box"><span class="celebration-emoji"></span><div class="celebration-title"></div><div class="celebration-msg"></div></div>`;
+  h+=`<div class="nav-btns">`;
+  h+=`<button class="next-btn ${isLast?'last':''}" id="next-btn" style="${hasChecks?'opacity:0.35;pointer-events:none':''}" onclick="${isLast?'goDone()':'openStep('+s.next+')'}">${isLast?'Concluir ciclo ⚡':'Próximo passo →'}</button>`;
   if(i>0) h+=`<button class="prev-btn" onclick="openStep(${i-1})">← Passo anterior</button>`;
   h+=`</div>`;
-
   document.getElementById('d-body').innerHTML=h;
+  sessionStart = Date.now();
   showScreen('detail');
 }
 
@@ -601,6 +793,7 @@ async function aiReply(stepIdx,sys){
     const data=await r.json();
     const text=data.content?.filter(b=>b.type==='text').map(b=>b.text).join('')||'Não consegui responder. Tenta de novo.';
     chatHist[stepIdx].push({role:'assistant',content:text});
+    sessionAIQuestions++;
     removeMsg(typingId);
     appendMsg('ai',text,null,false,true);
   }catch(e){
@@ -643,8 +836,10 @@ function saveFromChat(text,btn){
   const concept=lastUser?lastUser.content.slice(0,100):text.slice(0,100);
   const cards=loadCards();
   cards.unshift({id:Date.now(),concept,answer:text.replace(/\*\*(.*?)\*\*/g,'$1'),date:new Date().toLocaleDateString('pt-PT')});
+  sessionFlashcards++;
   saveCards(cards);
   updateBadge();
+renderStreak();
   btn.innerHTML='✓ Guardado!';
   btn.style.color='var(--green)';
   btn.style.borderColor='rgba(16,185,129,0.3)';
@@ -693,12 +888,14 @@ function markCard(id,result){
 function deleteCard(id){
   saveCards(loadCards().filter(c=>c.id!==id));
   updateBadge();
+renderStreak();
   const el=document.getElementById('fc-'+id);
   if(el)el.remove();
   if(loadCards().length===0)openReview();
 }
 
 updateBadge();
+renderStreak();
 </script>
 </body>
 </html>
